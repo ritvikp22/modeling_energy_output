@@ -126,6 +126,12 @@ consumption[Species(6,12)].append(Reactions({Species(2,4): 1}, dummyRate))
 consumption[Species(2,4)].append(Reactions({Species(6,12): 1}, dummyRate))
 production[Species(8, 16)].append(Reactions({Species(2,4): 1, Species(6,12): 1}, dummyRate))
 
+#Setting up Alpha Process
+
+for i in range(12, 28, 2):
+    consumption[Species(i, 2*i)].append(Reactions({Species(2, 4): 1}, dummyRate))
+    consumption[Species(2, 4)].append(Reactions({Species(i, 2*i): 1}, dummyRate))
+    production[Species(i+1, 2*i+2)].append(Reactions({Species(2,4): 1, Species(i, 2*i): 1}, dummyRate))
 
 
 
