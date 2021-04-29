@@ -141,9 +141,27 @@ for i in range(12, 28, 2):
         consumption[Species(i-1, 2*i)].append(Reactions({}, dummyRate))
         production[Species(i-2, 2*i)].append(Reactions({Species(i-1, 2*i): 1}, dummyRate))
  
-#Set up Carbon Fusion Cycle
+#Set up Carbon Burning
+
+consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(10, 20)].append(Reactions({Species(6, 12): 2}, dummyRate))
+production[Species(2, 4)].append(Reactions({Species(6, 12): 2}, dummyRate))
+
+consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(11, 23)].append(Reactions({Species(6, 12): 2}, dummyRate))
+production[Species(1, 1)].append(Reactions({Species(6, 12): 2}, dummyRate))
+
+consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(12, 23)].append(Reactions({Species(6, 12): 2}, dummyRate))
 
 
+consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(12, 24)].append(Reactions({Species(6, 12): 2}, dummyRate))
+
+
+consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(8, 16)].append(Reactions({Species(6, 12): 2}, dummyRate))
+production[Species(2, 4)].append(Reactions({Species(6, 12): 2}, 2*dummyRate))
 
 
 def memoizeComp(atomicNum, atomicMass, time):
