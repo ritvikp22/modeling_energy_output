@@ -113,6 +113,23 @@ production[Species(4, 8)].append(Reactions({Species(5, 8): 1}, dummyRate))
 consumption[Species(4, 8)].append(Reactions({}, dummyRate))
 production[Species(2, 4)].append(Reactions({Species(4, 8): 1}, 2 * dummyRate))
 
+#Setting up Triple Alpha Process
+
+consumption[Species(2,4)].append(Reactions({Species(2,4): 1}, dummyRate))
+production[Species(4,8)].append(Reactions({Species(2,4): 2}, dummyRate))
+
+consumption[Species(4,8)].append(Reactions({Species(2,4): 1}, dummyRate))
+consumption[Species(2,4)].append(Reactions({Species(4,8): 1}, dummyRate))
+production[Species(6,12)].append(Reactions({Species(2,4): 1, Species(4,8): 1}, dummyRate))
+
+consumption[Species(6,12)].append(Reactions({Species(2,4): 1}, dummyRate))
+consumption[Species(2,4)].append(Reactions({Species(6,12): 1}, dummyRate))
+production[Species(8, 16)].append(Reactions({Species(2,4): 1, Species(6,12): 1}, dummyRate))
+
+
+
+
+
 
 def memoizeComp(atomicNum, atomicMass, time):
     curr_species = Species(element(atomicNum), atomicMass)
