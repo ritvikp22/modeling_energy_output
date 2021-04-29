@@ -65,6 +65,9 @@ elements.append(Species(9, 18))
 elements.append(Species(9, 19))
 for i in range(10, 30, 2):
     elements.append(Species(i, 2*i))
+    if i > 20:
+        elements.append(Species(i-1, 2*i))
+        elements.append(Species(i-2, 2*i))
 production = {} #Reactions that produce some species i, only store the reactants
 consumption = {} #Reactions that consume some species i, only store the OTHER reactants
 
@@ -132,7 +135,13 @@ for i in range(12, 28, 2):
     consumption[Species(i, 2*i)].append(Reactions({Species(2, 4): 1}, dummyRate))
     consumption[Species(2, 4)].append(Reactions({Species(i, 2*i): 1}, dummyRate))
     production[Species(i+1, 2*i+2)].append(Reactions({Species(2,4): 1, Species(i, 2*i): 1}, dummyRate))
-
+    if i > 20:
+        consumption[Species(i, 2*i)].append(Reactions({}, dummyRate))
+        production[Species(i-1, 2*i)].append(Reactions({Species(i, 2*i): 1}, dummyRate))
+        consumption[Species(i-1, 2*i)].append(Reactions({}, dummyRate))
+        production[Species(i-2, 2*i)].append(Reactions({Species(i-1, 2*i): 1}, dummyRate))
+ 
+#Set up Carbon Fusion Cycle
 
 
 
