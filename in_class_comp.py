@@ -163,6 +163,33 @@ consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
 production[Species(8, 16)].append(Reactions({Species(6, 12): 2}, dummyRate))
 production[Species(2, 4)].append(Reactions({Species(6, 12): 2}, 2*dummyRate))
 
+#Set up CNO Cycle 1
+
+consumption[Species(6,12)].append(Reactions({Species(1,1): 1}, dummyRate))
+consumption[Species(1,1)].append(Reactions({Species(6,12): 1}, dummyRate))
+production[Species(7,13)].append(Reactions({Species(1,1): 1, Species(6,12): 1}, dummyRate))
+
+consumption[Species(7,13)].append(Reactions({}, dummyRate))
+production[Species(6,13)].append(Reactions({Species(7,13): 1}, dummyRate))
+
+consumption[Species(6,13)].append(Reactions({Species(1,1): 1}, dummyRate))
+consumption[Species(1,1)].append(Reactions({Species(6,13): 1}, dummyRate))
+production[Species(7,14)].append(Reactions({Species(1,1): 1, Species(6,13): 1}, dummyRate))
+
+consumption[Species(7,14)].append(Reactions({Species(1,1): 1}, dummyRate))
+consumption[Species(1,1)].append(Reactions({Species(7,14): 1}, dummyRate))
+production[Species(8,15)].append(Reactions({Species(1,1): 1, Species(7,14): 1}, dummyRate))
+
+consumption[Species(8,15)].append(Reactions({}, dummyRate))
+production[Species(7,15)].append(Reactions({Species(8,15): 1}, dummyRate))
+
+consumption[Species(7,15)].append(Reactions({Species(1,1): 1}, dummyRate))
+consumption[Species(1,1)].append(Reactions({Species(7,15): 1}, dummyRate))
+production[Species(6,12)].append(Reactions({Species(1,1): 1, Species(7,15): 1}, dummyRate))
+production[Species(2,4)].append(Reactions({Species(1,1): 1, Species(7,15): 1}, dummyRate))
+
+
+
 
 def memoizeComp(atomicNum, atomicMass, time):
     curr_species = Species(element(atomicNum), atomicMass)
