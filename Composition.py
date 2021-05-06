@@ -12,6 +12,8 @@ class Species:
         return (self.aNum, self.aMass) == (other.aNum, other.aMass)
     def getElement(self):
         return element(self.aNum).symbol
+    def getAtomicNum(self):
+        return self.aNum
     def getAtomicMass(self):
         return self.aMass
     def __str__(self):
@@ -319,25 +321,31 @@ def memoizeComp(atomicNum, atomicMass, time):
     if mass_fractions[curr_species][time] > -1:
         return mass_fractions[curr_species][time]
     last = memoizeComp(atomicNum, atomicMass, time-1)
+    placeHolder = last
     coef = dt*rho * atomicNum/m_h
     for x in production[curr_species]:
-        if x == (atomicNum, atomicMass):
-            delta = 1
-            temp = 0
-            last += temp*coef
+        temp = 0
+        if len(x.getElements()) == 1:
+            delta = 2
+            query = memoizeComp(list(x.getElements())[0].getAtomicNum(), list(x.getElements())[0].getAtomicMass(), time-1)
+            temp += query ** 2 / (delta * list(x.getElements())[0].getAtomicMass() ** 2)
+            temp *= x.getRate()
         else:
-            delta = 0
-            temp = 0
-            last += temp*coef
+            delta = 1
+            query1 = memoizeComp(x.getElements()[0].getAtomicNum(), x.getElements()[0].getAtomicMass(), time-1)
+            query2 = memoizeComp(x.getElements()[1].getAtomicNum(), x.getElements()[1].getAtomicMass(), time-1)
+            temp += query1 * query2
+            temp /= list(x.getElements())[0].getAtomicMass() * list(x.getElements())[1].getAtomicMass()
+            temp *= x.getRate()
+        last += coef * temp
     for x in consumption[curr_species]:
-        if x == (atomicNum, atomicMass):
-            delta = 1
-            temp = 0
-            last -= temp * coef
-        else:
-            delta = 0
-            temp = 0
-            last -= temp * coef
+        temp = 0
+        query1 = memoizeComp(list(x.getElements())[0].getAtomicNum(), list(x.getElements())[0].getAtomicMass(), time-1)
+        temp += query1 / list(x.getElements())[0].getAtomicMass()
+        temp *= x.getRate()
+        temp *= placeHolder
+        temp /= curr_species.getAtomicMass()
+        last -= coef * temp
     mass_fractions[curr_species][time] = last
     return last
 
