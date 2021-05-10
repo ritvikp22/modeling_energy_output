@@ -1,4 +1,5 @@
 from mendeleev import element
+import pprint
 
 dummyRate = 12
 class Species:
@@ -9,7 +10,7 @@ class Species:
     def __hash__(self):
         return hash(self.aNum) ^ hash(self.aMass)
     def __eq__(self, other):
-        return (self.aNum, self.aMass) == (other.aNum, other.aMass)
+        return self.aNum == other.aNum and self.aMass == other.aMass
     def getElement(self):
         return element(self.aNum).symbol
     def getAtomicNum(self):
@@ -25,7 +26,7 @@ class Reactions:
         self.rate = rate
 
     def __hash__(self):
-        return hash(self.stuff) ^ hash(self.rate)
+        return hash(len(self.stuff)) ^ hash(self.rate)
 
     def __eq__(self, other):
         if len(self.stuff) != len(other.stuff):
@@ -72,15 +73,21 @@ elements.append(Species(6, 13))
 elements.append(Species(7, 13))
 elements.append(Species(7, 14))
 elements.append(Species(7, 15))
+elements.append(Species(8, 14))
 elements.append(Species(8, 15))
 elements.append(Species(8, 16))
 elements.append(Species(8, 17))
+elements.append(Species(8, 18))
 elements.append(Species(9, 17))
 elements.append(Species(9, 18))
 elements.append(Species(9, 19))
 elements.append(Species(10, 18))
+elements.append(Species(10, 19))
+elements.append(Species(11, 23))
+elements.append(Species(12, 23))
 for i in range(10, 30, 2):
     elements.append(Species(i, 2*i))
+    elements.append(Species(i+1, 2*i + 2))
     if i > 20:
         elements.append(Species(i - 1, 2 * i))
         elements.append(Species(i - 2, 2 * i))
@@ -93,237 +100,239 @@ for e in elements:
     mass_fractions[e][0] = 0
     production[e] = set()
     consumption[e] = set()
+mass_fractions[Species(1,1)][0] = 1
 
 #Setting up pp chain
 
-consumption[Species(1,1)].append(Reactions({Species(1,1): 1}, dummyRate))
-production[Species(1,2)].append(Reactions({Species(1,1): 2}, dummyRate))
+consumption[Species(1,1)].add(Reactions({Species(1,1): 1}, dummyRate))
+production[Species(1,2)].add(Reactions({Species(1,1): 2}, dummyRate))
 
-consumption[Species(1, 1)].append(Reactions({Species(1, 2): 1}, dummyRate))
-consumption[Species(1, 2)].append(Reactions({Species(1, 1): 1}, dummyRate))
-production[Species(2, 3)].append(Reactions({Species(1, 1): 1, Species(2, 2): 2}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(1, 2): 1}, dummyRate))
+consumption[Species(1, 2)].add(Reactions({Species(1, 1): 1}, dummyRate))
+production[Species(2, 3)].add(Reactions({Species(1, 1): 1, Species(2, 2): 2}, dummyRate))
 
-consumption[Species(2, 3)].append(Reactions({Species(2, 3): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(2, 3): 2}, dummyRate))
-production[Species(1, 1)].append(Reactions({Species(2, 3): 2}, 2*dummyRate))
+consumption[Species(2, 3)].add(Reactions({Species(2, 3): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(2, 3): 2}, dummyRate))
+production[Species(1, 1)].add(Reactions({Species(2, 3): 2}, 2*dummyRate))
 
-consumption[Species(2, 3)].append(Reactions({Species(2, 4): 1}, dummyRate))
-consumption[Species(2, 4)].append(Reactions({Species(2, 3): 1}, dummyRate))
-production[Species(4, 7)].append(Reactions({Species(2, 3): 1, Species(2, 4): 1}, dummyRate))
+consumption[Species(2, 3)].add(Reactions({Species(2, 4): 1}, dummyRate))
+consumption[Species(2, 4)].add(Reactions({Species(2, 3): 1}, dummyRate))
+production[Species(4, 7)].add(Reactions({Species(2, 3): 1, Species(2, 4): 1}, dummyRate))
 
-consumption[Species(2, 3)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(2, 3): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(2, 3): 1, Species(1, 1): 1}, dummyRate))
+consumption[Species(2, 3)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(2, 3): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(2, 3): 1, Species(1, 1): 1}, dummyRate))
 
-consumption[Species(4, 7)].append(Reactions({}, dummyRate))
-production[Species(3, 7)].append(Reactions({Species(4, 7): 1}, dummyRate))
+consumption[Species(4, 7)].add(Reactions({}, dummyRate))
+production[Species(3, 7)].add(Reactions({Species(4, 7): 1}, dummyRate))
 
-consumption[Species(3, 7)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(3, 7): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(3, 7): 1, Species(1, 1): 1}, 2*dummyRate))
+consumption[Species(3, 7)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(3, 7): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(3, 7): 1, Species(1, 1): 1}, 2*dummyRate))
 
-consumption[Species(4, 7)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(4, 7): 1}, dummyRate))
-production[Species(5, 8)].append(Reactions({Species(1, 1): 1, Species(4, 7): 1}, dummyRate))
+consumption[Species(4, 7)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(4, 7): 1}, dummyRate))
+production[Species(5, 8)].add(Reactions({Species(1, 1): 1, Species(4, 7): 1}, dummyRate))
 
-consumption[Species(5, 8)].append(Reactions({}, dummyRate))
-production[Species(4, 8)].append(Reactions({Species(5, 8): 1}, dummyRate))
+consumption[Species(5, 8)].add(Reactions({}, dummyRate))
+production[Species(4, 8)].add(Reactions({Species(5, 8): 1}, dummyRate))
 
-consumption[Species(4, 8)].append(Reactions({}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(4, 8): 1}, 2 * dummyRate))
+consumption[Species(4, 8)].add(Reactions({}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(4, 8): 1}, 2 * dummyRate))
 
 # Setting up Triple Alpha Process
 
-consumption[Species(2, 4)].append(Reactions({Species(2, 4): 1}, dummyRate))
-production[Species(4, 8)].append(Reactions({Species(2, 4): 2}, dummyRate))
+consumption[Species(2, 4)].add(Reactions({Species(2, 4): 1}, dummyRate))
+production[Species(4, 8)].add(Reactions({Species(2, 4): 2}, dummyRate))
 
-consumption[Species(4, 8)].append(Reactions({Species(2, 4): 1}, dummyRate))
-consumption[Species(2, 4)].append(Reactions({Species(4, 8): 1}, dummyRate))
-production[Species(6, 12)].append(Reactions({Species(2, 4): 1, Species(4, 8): 1}, dummyRate))
+consumption[Species(4, 8)].add(Reactions({Species(2, 4): 1}, dummyRate))
+consumption[Species(2, 4)].add(Reactions({Species(4, 8): 1}, dummyRate))
+production[Species(6, 12)].add(Reactions({Species(2, 4): 1, Species(4, 8): 1}, dummyRate))
 
-consumption[Species(6, 12)].append(Reactions({Species(2, 4): 1}, dummyRate))
-consumption[Species(2, 4)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(8, 16)].append(Reactions({Species(2, 4): 1, Species(6, 12): 1}, dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(2, 4): 1}, dummyRate))
+consumption[Species(2, 4)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(8, 16)].add(Reactions({Species(2, 4): 1, Species(6, 12): 1}, dummyRate))
 
 # Setting up Alpha Process
 
 for i in range(12, 28, 2):
-    consumption[Species(i, 2 * i)].append(Reactions({Species(2, 4): 1}, dummyRate))
-    consumption[Species(2, 4)].append(Reactions({Species(i, 2 * i): 1}, dummyRate))
-    production[Species(i + 1, 2 * i + 2)].append(Reactions({Species(2, 4): 1, Species(i, 2 * i): 1}, dummyRate))
+    consumption[Species(i, 2 * i)].add(Reactions({Species(2, 4): 1}, dummyRate))
+    consumption[Species(2, 4)].add(Reactions({Species(i, 2 * i): 1}, dummyRate))
+    production[Species(i + 1, 2 * i + 2)].add(Reactions({Species(2, 4): 1, Species(i, 2 * i): 1}, dummyRate))
     if i > 20:
-        consumption[Species(i, 2 * i)].append(Reactions({}, dummyRate))
-        production[Species(i - 1, 2 * i)].append(Reactions({Species(i, 2 * i): 1}, dummyRate))
-        consumption[Species(i - 1, 2 * i)].append(Reactions({}, dummyRate))
-        production[Species(i - 2, 2 * i)].append(Reactions({Species(i - 1, 2 * i): 1}, dummyRate))
+        consumption[Species(i, 2 * i)].add(Reactions({}, dummyRate))
+        production[Species(i - 1, 2 * i)].add(Reactions({Species(i, 2 * i): 1}, dummyRate))
+        consumption[Species(i - 1, 2 * i)].add(Reactions({}, dummyRate))
+        production[Species(i - 2, 2 * i)].add(Reactions({Species(i - 1, 2 * i): 1}, dummyRate))
 
 # Set up Carbon Burning
 
-consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(10, 20)].append(Reactions({Species(6, 12): 2}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(6, 12): 2}, dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(10, 20)].add(Reactions({Species(6, 12): 2}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(6, 12): 2}, dummyRate))
 
-consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(11, 23)].append(Reactions({Species(6, 12): 2}, dummyRate))
-production[Species(1, 1)].append(Reactions({Species(6, 12): 2}, dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(11, 23)].add(Reactions({Species(6, 12): 2}, dummyRate))
+production[Species(1, 1)].add(Reactions({Species(6, 12): 2}, dummyRate))
 
-consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(12, 23)].append(Reactions({Species(6, 12): 2}, dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(12, 23)].add(Reactions({Species(6, 12): 2}, dummyRate))
 
-consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(12, 24)].append(Reactions({Species(6, 12): 2}, dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(12, 24)].add(Reactions({Species(6, 12): 2}, dummyRate))
 
-consumption[Species(6, 12)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(8, 16)].append(Reactions({Species(6, 12): 2}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(6, 12): 2}, 2 * dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(8, 16)].add(Reactions({Species(6, 12): 2}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(6, 12): 2}, 2 * dummyRate))
 
 # Set up CNO Cycle 1
 
-consumption[Species(6, 12)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(6, 12): 1}, dummyRate))
-production[Species(7, 13)].append(Reactions({Species(1, 1): 1, Species(6, 12): 1}, dummyRate))
+consumption[Species(6, 12)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(6, 12): 1}, dummyRate))
+production[Species(7, 13)].add(Reactions({Species(1, 1): 1, Species(6, 12): 1}, dummyRate))
 
-consumption[Species(7, 13)].append(Reactions({}, dummyRate))
-production[Species(6, 13)].append(Reactions({Species(7, 13): 1}, dummyRate))
+consumption[Species(7, 13)].add(Reactions({}, dummyRate))
+production[Species(6, 13)].add(Reactions({Species(7, 13): 1}, dummyRate))
 
-consumption[Species(6, 13)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(6, 13): 1}, dummyRate))
-production[Species(7, 14)].append(Reactions({Species(1, 1): 1, Species(6, 13): 1}, dummyRate))
+consumption[Species(6, 13)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(6, 13): 1}, dummyRate))
+production[Species(7, 14)].add(Reactions({Species(1, 1): 1, Species(6, 13): 1}, dummyRate))
 
-consumption[Species(7, 14)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(7, 14): 1}, dummyRate))
-production[Species(8, 15)].append(Reactions({Species(1, 1): 1, Species(7, 14): 1}, dummyRate))
+consumption[Species(7, 14)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(7, 14): 1}, dummyRate))
+production[Species(8, 15)].add(Reactions({Species(1, 1): 1, Species(7, 14): 1}, dummyRate))
 
-consumption[Species(8, 15)].append(Reactions({}, dummyRate))
-production[Species(7, 15)].append(Reactions({Species(8, 15): 1}, dummyRate))
+consumption[Species(8, 15)].add(Reactions({}, dummyRate))
+production[Species(7, 15)].add(Reactions({Species(8, 15): 1}, dummyRate))
 
-consumption[Species(7, 15)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(7, 15): 1}, dummyRate))
-production[Species(6, 12)].append(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
+consumption[Species(7, 15)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(7, 15): 1}, dummyRate))
+production[Species(6, 12)].add(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
 
 #Set up CNO Cycle 2
 
-consumption[Species(7, 15)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(7, 15): 1}, dummyRate))
-production[Species(8, 16)].append(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
+consumption[Species(7, 15)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(7, 15): 1}, dummyRate))
+production[Species(8, 16)].add(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
 
-consumption[Species(8, 16)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 16): 1}, dummyRate))
-production[Species(9, 17)].append(Reactions({Species(1, 1): 1, Species(8, 16): 1}, dummyRate))
+consumption[Species(8, 16)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 16): 1}, dummyRate))
+production[Species(9, 17)].add(Reactions({Species(1, 1): 1, Species(8, 16): 1}, dummyRate))
 
-consumption[Species(9, 17)].append(Reactions({}, dummyRate))
-production[Species(8, 17)].append(Reactions({Species(9, 17): 1}, dummyRate))
+consumption[Species(9, 17)].add(Reactions({}, dummyRate))
+production[Species(8, 17)].add(Reactions({Species(9, 17): 1}, dummyRate))
 
-consumption[Species(8, 17)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 17): 1}, dummyRate))
-production[Species(7, 14)].append(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
+consumption[Species(8, 17)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 17): 1}, dummyRate))
+production[Species(7, 14)].add(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
 
-consumption[Species(7, 14)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(7, 14): 1}, dummyRate))
-production[Species(8, 15)].append(Reactions({Species(1, 1): 1, Species(7, 14): 1}, dummyRate))
+consumption[Species(7, 14)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(7, 14): 1}, dummyRate))
+production[Species(8, 15)].add(Reactions({Species(1, 1): 1, Species(7, 14): 1}, dummyRate))
 
-consumption[Species(8, 15)].append(Reactions({}, dummyRate))
-production[Species(7, 15)].append(Reactions({Species(8, 15): 1}, dummyRate))
+consumption[Species(8, 15)].add(Reactions({}, dummyRate))
+production[Species(7, 15)].add(Reactions({Species(8, 15): 1}, dummyRate))
 
 #Set up CNO Cycle 3
 
-consumption[Species(8, 17)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 17): 1}, dummyRate))
-production[Species(9, 18)].append(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
+consumption[Species(8, 17)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 17): 1}, dummyRate))
+production[Species(9, 18)].add(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
 
-consumption[Species(9, 18)].append(Reactions({}, dummyRate))
-production[Species(8, 18)].append(Reactions({Species(9, 18): 1}, dummyRate))
+consumption[Species(9, 18)].add(Reactions({}, dummyRate))
+production[Species(8, 18)].add(Reactions({Species(9, 18): 1}, dummyRate))
 
-consumption[Species(8, 18)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 18): 1}, dummyRate))
-production[Species(7, 15)].append(Reactions({Species(1, 1): 1, Species(8, 18): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(1, 1): 1, Species(8, 18): 1}, dummyRate))
+consumption[Species(8, 18)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 18): 1}, dummyRate))
+production[Species(7, 15)].add(Reactions({Species(1, 1): 1, Species(8, 18): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(8, 18): 1}, dummyRate))
 
-consumption[Species(7, 15)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(7, 15): 1}, dummyRate))
-production[Species(8, 16)].append(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
+consumption[Species(7, 15)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(7, 15): 1}, dummyRate))
+production[Species(8, 16)].add(Reactions({Species(1, 1): 1, Species(7, 15): 1}, dummyRate))
 
-consumption[Species(8, 16)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 16): 1}, dummyRate))
-production[Species(9, 17)].append(Reactions({Species(1, 1): 1, Species(8, 16): 1}, dummyRate))
+consumption[Species(8, 16)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 16): 1}, dummyRate))
+production[Species(9, 17)].add(Reactions({Species(1, 1): 1, Species(8, 16): 1}, dummyRate))
 
-consumption[Species(9, 17)].append(Reactions({}, dummyRate))
-production[Species(8, 17)].append(Reactions({Species(9, 17): 1}, dummyRate))
+consumption[Species(9, 17)].add(Reactions({}, dummyRate))
+production[Species(8, 17)].add(Reactions({Species(9, 17): 1}, dummyRate))
 
 #Set up CNO Cycle 4
 
-consumption[Species(8, 18)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 18): 1}, dummyRate))
-production[Species(9, 19)].append(Reactions({Species(1, 1): 1, Species(8, 18): 1}, dummyRate))
+consumption[Species(8, 18)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 18): 1}, dummyRate))
+production[Species(9, 19)].add(Reactions({Species(1, 1): 1, Species(8, 18): 1}, dummyRate))
 
-consumption[Species(9, 19)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(9, 19): 1}, dummyRate))
-production[Species(8, 16)].append(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
+consumption[Species(9, 19)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(9, 19): 1}, dummyRate))
+production[Species(8, 16)].add(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
 
-consumption[Species(8, 16)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 16): 1}, dummyRate))
-production[Species(9, 19)].append(Reactions({Species(1, 1): 1, Species(8, 16): 1}, dummyRate))
+consumption[Species(8, 16)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 16): 1}, dummyRate))
+production[Species(9, 19)].add(Reactions({Species(1, 1): 1, Species(8, 16): 1}, dummyRate))
 
-consumption[Species(9, 17)].append(Reactions({}, dummyRate))
-production[Species(8, 17)].append(Reactions({Species(9, 17): 1}, dummyRate))
+consumption[Species(9, 17)].add(Reactions({}, dummyRate))
+production[Species(8, 17)].add(Reactions({Species(9, 17): 1}, dummyRate))
 
-consumption[Species(8, 17)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(8, 17): 1}, dummyRate))
-production[Species(9, 18)].append(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
+consumption[Species(8, 17)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(8, 17): 1}, dummyRate))
+production[Species(9, 18)].add(Reactions({Species(1, 1): 1, Species(8, 17): 1}, dummyRate))
 
-consumption[Species(9, 18)].append(Reactions({}, dummyRate))
-production[Species(8, 18)].append(Reactions({Species(9, 18): 1}, dummyRate))
+consumption[Species(9, 18)].add(Reactions({}, dummyRate))
+production[Species(8, 18)].add(Reactions({Species(9, 18): 1}, dummyRate))
 
 #Set up HCNO 1
 
-consumption[Species(7, 13)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(7, 13): 1}, dummyRate))
-production[Species(8, 14)].append(Reactions({Species(1, 1): 1, Species(7, 13): 1}, dummyRate))
+consumption[Species(7, 13)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(7, 13): 1}, dummyRate))
+production[Species(8, 14)].add(Reactions({Species(1, 1): 1, Species(7, 13): 1}, dummyRate))
 
-consumption[Species(8, 14)].append(Reactions({}, dummyRate))
-production[Species(7, 14)].append(Reactions({Species(8, 14): 1}, dummyRate))
+consumption[Species(8, 14)].add(Reactions({}, dummyRate))
+production[Species(7, 14)].add(Reactions({Species(8, 14): 1}, dummyRate))
 
 #Set up HCNO 2
 
-consumption[Species(9, 17)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(9, 17): 1}, dummyRate))
-production[Species(10, 18)].append(Reactions({Species(1, 1): 1, Species(9, 17): 1}, dummyRate))
+consumption[Species(9, 17)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(9, 17): 1}, dummyRate))
+production[Species(10, 18)].add(Reactions({Species(1, 1): 1, Species(9, 17): 1}, dummyRate))
 
-consumption[Species(10, 18)].append(Reactions({}, dummyRate))
-production[Species(9, 18)].append(Reactions({Species(10, 18): 1}, dummyRate))
+consumption[Species(10, 18)].add(Reactions({}, dummyRate))
+production[Species(9, 18)].add(Reactions({Species(10, 18): 1}, dummyRate))
 
-consumption[Species(9, 18)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(9, 18): 1}, dummyRate))
-production[Species(8, 15)].append(Reactions({Species(1, 1): 1, Species(9, 18): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(1, 1): 1, Species(9, 18): 1}, dummyRate))
+consumption[Species(9, 18)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(9, 18): 1}, dummyRate))
+production[Species(8, 15)].add(Reactions({Species(1, 1): 1, Species(9, 18): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(9, 18): 1}, dummyRate))
 
 #Set up HCNO 3
 
-consumption[Species(9, 18)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(9, 18): 1}, dummyRate))
-production[Species(10, 19)].append(Reactions({Species(1, 1): 1, Species(9, 18): 1}, dummyRate))
+consumption[Species(9, 18)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(9, 18): 1}, dummyRate))
+production[Species(10, 19)].add(Reactions({Species(1, 1): 1, Species(9, 18): 1}, dummyRate))
 
-consumption[Species(10, 19)].append(Reactions({}, dummyRate))
-production[Species(9, 19)].append(Reactions({Species(10, 19): 1}, dummyRate))
+consumption[Species(10, 19)].add(Reactions({}, dummyRate))
+production[Species(9, 19)].add(Reactions({Species(10, 19): 1}, dummyRate))
 
-consumption[Species(9, 19)].append(Reactions({Species(1, 1): 1}, dummyRate))
-consumption[Species(1, 1)].append(Reactions({Species(9, 19): 1}, dummyRate))
-production[Species(8, 16)].append(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
-production[Species(2, 4)].append(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
+consumption[Species(9, 19)].add(Reactions({Species(1, 1): 1}, dummyRate))
+consumption[Species(1, 1)].add(Reactions({Species(9, 19): 1}, dummyRate))
+production[Species(8, 16)].add(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
+production[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dummyRate))
 
 
 
 def memoizeComp(atomicNum, atomicMass, time):
-    curr_species = Species(element(atomicNum), atomicMass)
+    curr_species = Species(atomicNum, atomicMass)
     if mass_fractions[curr_species][time] > -1:
         return mass_fractions[curr_species][time]
     last = memoizeComp(atomicNum, atomicMass, time-1)
     placeHolder = last
     coef = dt*rho * atomicNum/m_h
     for x in production[curr_species]:
+        print(x)
         temp = 0
         if len(x.getElements()) == 1:
             delta = 2
@@ -348,6 +357,8 @@ def memoizeComp(atomicNum, atomicMass, time):
         last -= coef * temp
     mass_fractions[curr_species][time] = last
     return last
-
-
+pprint.pprint(production[elements[0]])
+for i in range(1, 100):
+    for e in elements:
+        memoizeComp(e.getAtomicNum(), e.getAtomicMass(), i)
 
