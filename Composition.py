@@ -110,7 +110,7 @@ creation[Species(1,2)].add(Reactions({Species(1,1): 2}, dummyRate))
 
 destruction[Species(1, 1)].add(Reactions({Species(1, 2): 1}, dummyRate))
 destruction[Species(1, 2)].add(Reactions({Species(1, 1): 1}, dummyRate))
-creation[Species(2, 3)].add(Reactions({Species(1, 1): 1, Species(1, 2): 2}, dummyRate))
+creation[Species(2, 3)].add(Reactions({Species(1, 1): 1, Species(1, 2): 1}, dummyRate))
 
 destruction[Species(2, 3)].add(Reactions({Species(2, 3): 1}, dummyRate))
 creation[Species(2, 4)].add(Reactions({Species(2, 3): 2}, dummyRate))
