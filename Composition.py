@@ -97,7 +97,7 @@ destruction = {} #Reactions that consume some species i, only store the OTHER re
 
 mass_fractions = {}
 for e in elements:
-    mass_fractions[e] = [-1]*100
+    mass_fractions[e] = [-1]*1000000
     mass_fractions[e][0] = 0
     creation[e] = set()
     destruction[e] = set()
@@ -320,7 +320,7 @@ creation[Species(2, 4)].add(Reactions({Species(1, 1): 1, Species(9, 19): 1}, dum
 
 
 
-def memoizeComp(atomicNum, atomicMass, time):
+def dpComp(atomicNum, atomicMass, time):
     curr_species = Species(atomicNum, atomicMass)
     last = mass_fractions[curr_species][time-1]
     coef = 1.0 * dt*rho * atomicMass/m_h
@@ -359,10 +359,9 @@ def memoizeComp(atomicNum, atomicMass, time):
     return last + coef * sum
 
 
-for i in range(1,100):
+for i in range(1,100000):
     for e in elements:
-        mass_fractions[e][i] = memoizeComp(e.getAtomicNum(), e.getAtomicMass(), i)
+        mass_fractions[e][i] = dpComp(e.getAtomicNum(), e.getAtomicMass(), i)
 
 for e in elements:
-    print(str(e) + ": " + str(mass_fractions[e]))
-
+    print(str(e) + " " + str(mass_fractions[e][99999]))
