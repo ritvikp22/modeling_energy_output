@@ -2,7 +2,7 @@ from mendeleev import element
 import math
 from pprint import pprint
 
-dummyRate = 0.0001
+dummyRate = 10 ** -60
 class Species:
     def __init__(self, aNum, aMass):
         self.aNum = aNum
@@ -24,7 +24,7 @@ class Species:
 class Reactions:
     def __init__(self, stuff, rate, energy):
         self.stuff = stuff
-        self.rate = rate
+        self.rate = dummyRate
         self.energy = 0 if energy == None else energy
 
     def __hash__(self):
@@ -66,9 +66,10 @@ class Reactions:
 
 dt = 100
 m_h = 1.67 * 10**-24
-rho = 10**-24 #to be determined, dummy number for now
-
-
+stefan = 5.670374419 * 10 ** -8
+radius = 6.5 * 6.957 * 10 ** 8
+mass = 1.98847 * 10 ** 33
+rho = mass * 3.0 / (4.0 * math.pi * radius * radius * radius)
 elements = []
 elements.append(Species(1, 1))
 elements.append(Species(1, 2))
@@ -410,11 +411,16 @@ def dpEnergy(time):
             sum += temp
     sum *= rho
     sum /= (m_h * m_h)
+    sum *= dt
+    sum *= 15
+    sum *= mass
     return sum
 
 def dpTemperature(time):
     q = 1.0 * energy[time] / dt
-
+    q /= (4 * math.pi)
+    q /= stefan
+    q /= (radius * radius)
     T = q ** 0.25
     return T
 
@@ -424,9 +430,13 @@ for i in range(1,1000):
     for e in elements:
         mass_fractions[e][i] = dpComp(e.getAtomicNum(), e.getAtomicMass(), i)
     energy[i] = dpEnergy(i)
+    energy[i]*= (1.6021773 * 10 ** -13)
+    #print(energy[i])
     temperature[i] = dpTemperature(i)
+    #print(temperature[i])
 
-print(temperature[995])
-#for e in elements:
- #   print(str(e) + " " + str(mass_fractions[e][9999]))
+
+
+for e in elements:
+    print(str(e) + " " + str(mass_fractions[e][999]))
 
