@@ -71,7 +71,7 @@ class Reactions:
         return temp
 
 
-dt = 86400
+dt = 31540000
 m_h = 1.67 * 10**-24
 stefan = 5.670374419 * 10 ** -8
 radius = 6.5 * 6.957 * 10 ** 8
@@ -486,6 +486,8 @@ def dpComp(atomicNum, atomicMass, time):
     coef = 1.0 * dt*rho * atomicMass/m_h
     sum = 0
     for x in creation[curr_species]:
+        if time > 1:
+            x.setRate(temperature[time-2], temperature[time-1])
         if len(x.getElementList()) == 1:
             curr_key = Species(x.getElement(0).getAtomicNum(), x.getElement(0).getAtomicMass())
             if curr_key not in mass_fractions:
@@ -553,15 +555,13 @@ def dpTemperature(time):
 
 
 
-for i in range(1,10):
+for i in range(1,10000):
     for e in elements:
         mass_fractions[e][i] = dpComp(e.getAtomicNum(), e.getAtomicMass(), i)
     energy[i] = dpEnergy(i)
-    energy[i]*= (1.6021773 * 10 ** -13)
+    energy[i] *= (1.6021773 * 10 ** -13)
     if i > 1:
         temperature[i] = dpTemperature(i)
-    print(energy[i])
-    print(temperature[i])
 
 
 
