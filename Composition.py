@@ -2,7 +2,6 @@ from mendeleev import element
 import math
 from pprint import pprint
 
-dummyRate = 10 ** -60
 class Species:
     def __init__(self, aNum, aMass):
         self.aNum = aNum
@@ -52,8 +51,16 @@ class Reactions:
         return list(self.stuff.keys())[index]
     def getRate(self):
         return self.rate
-    def setRate(self, factor):
-        self.rate /= factor
+    def setRate(self, oldT, newT):
+        oldFactor = 1.0
+        oldFactor *= (oldT ** (-2.0 / 3.0))
+        oldFactor *= math.exp(-1.0 * oldT ** (-1.0 / 3.0))
+        newFactor = 1.0
+        newFactor *= (newT ** (-2.0 / 3.0))
+        newFactor *= math.exp(-1.0 * newT ** (-1.0 / 3.0))
+        self.rate /= oldFactor
+        self.rate *= newFactor
+
     def getEnergy(self):
         return self.energy
     def __str__(self):
@@ -64,14 +71,13 @@ class Reactions:
         return temp
 
 
-dt = 100
+dt = 86400
 m_h = 1.67 * 10**-24
 stefan = 5.670374419 * 10 ** -8
 radius = 6.5 * 6.957 * 10 ** 8
 mass = 1.98847 * 10 ** 33
 Temperature = 29850.0
 rho = mass * 3.0 / (4.0 * math.pi * radius * radius * radius)
-rho *= m_h
 rrc = 4.0 / (3 ** 2.5)
 rrc /= (math.pi * math.pi)
 rrc *= (6.62607015 * 10 ** -31)
@@ -79,6 +85,11 @@ rrc /= m_h
 rrc /= (math.e * math.e)
 rrc *= (Temperature ** (-2.0/3.0))
 rrc *= math.exp(-1.0 * Temperature ** (-1.0/3.0))
+
+#Putting in value for S(E_0), found based on calculations with the sun
+
+rrc /= (3 * 10 ** 30)
+rrc *= (3.828 / 3.19635)
 
 elements = []
 elements.append(Species(1, 1))
@@ -118,20 +129,23 @@ for e in elements:
     mass_fractions[e][0] = 0
     creation[e] = set()
     destruction[e] = set()
-total = 10**12+10**10.92+10**8.26+10**7.62+10**8.43+10**8.26+10**7.60+10**7.14+10**7.30
+total = 1.0*1*10**12+4*10**10.92+12*10**8.26+14*10**7.62+16*10**8.43+20*10**8.26+24*10**7.60+28*10**7.14+52*10**7.30
 mass_fractions[Species(1,1)][0] = 1.0 * (10**12) / total
-mass_fractions[Species(2,4)][0] = 1.0 * (10**10.92) / total
-mass_fractions[Species(6,12)][0] = 1.0 * (10**8.26) / total
-mass_fractions[Species(7,14)][0] = 1.0 * (10**7.62) / total
-mass_fractions[Species(8,16)][0] = 1.0 * (10**8.43) / total
-mass_fractions[Species(10,20)][0] = 1.0 * (10**8.26) / total
-mass_fractions[Species(12,24)][0] = 1.0 * (10**7.60) / total
-mass_fractions[Species(14,28)][0] = 1.0 * (10**7.14) / total
-mass_fractions[Species(26,52)][0] = 1.0 * (10**7.30) / total
+mass_fractions[Species(2,4)][0] = 4.0 * (10**10.92) / total
+mass_fractions[Species(6,12)][0] = 12.0 * (10**8.26) / total
+mass_fractions[Species(7,14)][0] = 14.0 * (10**7.62) / total
+mass_fractions[Species(8,16)][0] = 16.0 * (10**8.43) / total
+mass_fractions[Species(10,20)][0] = 20.0 * (10**8.26) / total
+mass_fractions[Species(12,24)][0] = 24.0 * (10**7.60) / total
+mass_fractions[Species(14,28)][0] = 28.0 * (10**7.14) / total
+mass_fractions[Species(26,52)][0] = 52.0 * (10**7.30) / total
 reactions = set()
 
 energy = [0] * 1000000
 temperature = [0] * 1000000
+
+temperature[0] = Temperature
+temperature[1] = Temperature
 
 def findFactor(a, b):
     temp = 1.0
@@ -539,17 +553,20 @@ def dpTemperature(time):
 
 
 
-for i in range(1,1000):
+for i in range(1,10):
     for e in elements:
         mass_fractions[e][i] = dpComp(e.getAtomicNum(), e.getAtomicMass(), i)
     energy[i] = dpEnergy(i)
     energy[i]*= (1.6021773 * 10 ** -13)
+    if i > 1:
+        temperature[i] = dpTemperature(i)
     print(energy[i])
-    #temperature[i] = dpTemperature(i)
-    #print(temperature[i])
+    print(temperature[i])
 
 
 
-for e in elements:
-    print(str(e) + " " + str(mass_fractions[e][999]))
+
+
+
+
 
