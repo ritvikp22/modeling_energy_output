@@ -1,6 +1,7 @@
 from mendeleev import element
 import math
 from pprint import pprint
+import csv
 
 class Species:
     def __init__(self, aNum, aMass):
@@ -18,7 +19,7 @@ class Species:
     def getAtomicMass(self):
         return self.aMass
     def __str__(self):
-        return "(" + self.getElement() + "," + str(self.getAtomicMass()) + ")"
+        return "(" + self.getElement() + "," + str(self.getAtomicNum()) + "," + str(self.getAtomicMass()) + ")"
 
 class Reactions:
     def __init__(self, stuff, rate, energy):
@@ -71,7 +72,7 @@ class Reactions:
         return temp
 
 
-dt = 31540000
+dt = 3.154 * 10 ** 11
 m_h = 1.67 * 10**-24
 stefan = 5.670374419 * 10 ** -8
 radius = 6.5 * 6.957 * 10 ** 8
@@ -546,22 +547,40 @@ def dpEnergy(time):
     return sum
 
 def dpTemperature(time):
+    return Temperature
     q = 1.0 * energy[time] / dt
     q /= (4 * math.pi)
     q /= stefan
     q /= (radius * radius)
     T = q ** 0.25
-    return T
+    #return T
+
+filename = "Blue_Giant_Data.csv"
+cols = ["Time Index", "Energy Output", "Temperature"]
+for e in elements:
+    cols.append(str(e))
+firstRow = [str(0), str(0), str(Temperature)]
+for e in elements:
+    firstRow.append(str(mass_fractions[e][0]))
+with open(filename, 'w') as csvfile:
+    csvwriter = csv.writer(csvfile)
+    csvwriter.writerow(cols)
+    csvwriter.writerow(firstRow)
+    for i in range(1,30000):
+        dataRow = [str(i)]
+        for e in elements:
+            mass_fractions[e][i] = dpComp(e.getAtomicNum(), e.getAtomicMass(), i)
+        energy[i] = dpEnergy(i)
+        energy[i] *= (1.6021773 * 10 ** -13)
+        if i > 1:
+            temperature[i] = dpTemperature(i)
+        dataRow.append(str(energy[i]))
+        dataRow.append(str(temperature[i]))
+        for e in elements:
+            dataRow.append(str(mass_fractions[e][i]))
+        csvwriter.writerow(dataRow)
 
 
-
-for i in range(1,10000):
-    for e in elements:
-        mass_fractions[e][i] = dpComp(e.getAtomicNum(), e.getAtomicMass(), i)
-    energy[i] = dpEnergy(i)
-    energy[i] *= (1.6021773 * 10 ** -13)
-    if i > 1:
-        temperature[i] = dpTemperature(i)
 
 
 
